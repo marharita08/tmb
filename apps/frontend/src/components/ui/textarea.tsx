@@ -31,9 +31,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             htmlFor={id}
             className={cn(
               "absolute left-3 text-foreground top-2 text-base transition-all duration-200 bg-background px-1 cursor-text",
-              "peer-focus:left-5 peer-focus:top-[-0.6rem] peer-focus:-translate-y-0 peer-focus:text-xs peer-focus:font-medium peer-focus:text-primary",
+              "peer-focus:left-5 peer-focus:top-[-0.6rem] peer-focus:translate-y-0 peer-focus:text-xs peer-focus:font-medium peer-focus:text-primary",
               (value || !isEmpty || placeholder) &&
-                "left-5 top-[-0.6rem] -translate-y-0 text-xs md:text-xs font-medium text-foreground h-[11px]",
+                "left-5 top-[-0.6rem] translate-y-0 text-xs md:text-xs font-medium text-foreground h-[11px]",
               error && "text-error peer-focus:text-error",
             )}
           >

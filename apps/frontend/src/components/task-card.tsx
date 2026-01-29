@@ -1,10 +1,12 @@
-import type { TaskResponse } from "@/types/task";
-import { Button } from "./ui/button";
 import { SquarePenIcon, Trash2Icon } from "lucide-react";
+
+import type { TaskResponse } from "@/types/task.type";
+
+import { Button } from "./ui/button";
 
 type TaskCardProps = {
   task: TaskResponse;
-}
+};
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
@@ -20,5 +22,5 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};

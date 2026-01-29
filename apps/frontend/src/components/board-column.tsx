@@ -1,44 +1,66 @@
+import { CircleXIcon } from "lucide-react";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+
 import { TaskStatus, TaskStatusLabels } from "@/const/task-status";
+import { useTasks } from "@/hooks/use-tasks";
+import { useCurrentBoardStore } from "@/store/current-board.store";
+
 import { TaskCard } from "./task-card";
-import { useState } from "react";
-import type { TaskResponse } from "@/types/task";
-import { Button } from "./ui/button";
-import { PlusIcon } from "lucide-react";
+import { Loading } from "./ui/loading";
+import { AddTaskDialog } from "./add-task-dialog";
 
 type BoardColumnProps = {
   taskStatus: TaskStatus;
-}
+};
 
 export const BoardColumn: React.FC<BoardColumnProps> = ({ taskStatus }) => {
-  const [tasks, setTasks] = useState<TaskResponse[]>([{
-    id: '1',
-    title: 'Task 1',
-    description: 'Task 1 description',
-    status: taskStatus,
-    position: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }]);
+  const { board } = useCurrentBoardStore();
+
+  const {
+    data: tasks,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useTasks({ boardId: board?.id ?? "", status: taskStatus });
+
+  const { ref: observerTarget, inView } = useInView();
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+
+  const isEmpty =
+    !isLoading &&
+    !isError &&
+    (!tasks || tasks.pages.flatMap((page) => page.items).length === 0);
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-center">{TaskStatusLabels[taskStatus]}</h3>
+      <h3 className="text-lg font-semibold text-center">
+        {TaskStatusLabels[taskStatus]}
+      </h3>
       <div className="bg-primary/20 p-4 rounded-md flex flex-col gap-4">
-        {
-          tasks.map((task) => (
+        {isEmpty && <div className="text-center">No tasks found</div>}
+        {tasks?.pages
+          .flatMap((page) => page.items)
+          .map((task) => (
             <TaskCard key={task.id} task={task} />
-          ))
-        }
-        {
-          taskStatus === TaskStatus.TODO && (
-            <button className="bg-white rounded-md px-4 py-2 flex justify-center cursor-pointer hover:text-primary">
-            
-              <PlusIcon className="w-10 h-10" />
-            
-            </button>
-          )
-        }
+          ))}
+        {isLoading || (isFetchingNextPage && <Loading />)}
+        {isError && (
+          <div className="text-error flex items-center gap-2 justify-center">
+            <CircleXIcon className="w-4 h-4 text-error" />
+            Error loading tasks
+          </div>
+        )}
+        <div ref={observerTarget} />
+        {taskStatus === TaskStatus.TODO && <AddTaskDialog />}
       </div>
     </div>
-  )
-}
+  );
+};

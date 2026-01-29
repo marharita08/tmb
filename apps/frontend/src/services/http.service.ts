@@ -1,4 +1,4 @@
-import { HttpException } from "@/types/exception";
+import { HttpException } from "@/types/exception.type";
 
 type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -111,4 +111,4 @@ class HttpService {
   }
 }
 
-export const httpService = new HttpService(process.env.NEXT_PUBLIC_API_URL!);
+export const httpService = new HttpService(import.meta.env.VITE_API_URL);

@@ -1,10 +1,13 @@
 "use client";
-import { type QueryKey, useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import {
+  type QueryKey,
+  useQuery,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { toast } from "@/hooks/use-toast";
-
-import { HttpException } from "@/types/exception";
+import { HttpException } from "@/types/exception.type";
 
 type AppQueryProps<
   TQueryFnData = unknown,

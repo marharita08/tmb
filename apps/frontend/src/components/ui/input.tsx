@@ -1,8 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/utils/cn";
-import { X } from "lucide-react";
 
 const inputVariants = cva(
   "text-foreground flex w-full shadow-inner-bottom peer rounded-md bg-background px-3 py-2 text-base md:text-base transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-offset-0",
@@ -112,9 +112,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               !placeholder &&
                 "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2",
               startIcon && "peer-placeholder-shown:left-9 ",
-              "peer-focus:left-5 peer-focus:top-[-0.6rem] peer-focus:-translate-y-0 peer-focus:text-xs peer-focus:font-medium peer-focus:text-primary",
+              "peer-focus:left-5 peer-focus:top-[-0.6rem] peer-focus:translate-y-0 peer-focus:text-xs peer-focus:font-medium peer-focus:text-primary",
               (value || !isEmpty || placeholder) &&
-                "top-[-0.6rem] -translate-y-0 text-xs md:text-xs font-medium text-foreground left-5 h-[11px]",
+                "top-[-0.6rem] translate-y-0 text-xs md:text-xs font-medium text-foreground left-5 h-[11px]",
               labelClassName,
               actualVariant === "error" && "text-error peer-focus:text-error",
               disabled && "cursor-not-allowed opacity-50",
