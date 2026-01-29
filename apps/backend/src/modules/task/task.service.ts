@@ -13,7 +13,7 @@ export class TaskService {
     const lastTask = await this.prisma.task.findFirst({
       where: {
         boardId: createTaskDto.boardId,
-        status: createTaskDto.status,
+        status: TaskStatus.TODO,
       },
       orderBy: {
         position: 'desc',
