@@ -43,7 +43,7 @@ export const AddBoardDialog = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button>
           <PlusIcon className="w-4 h-4" />
           Add Board

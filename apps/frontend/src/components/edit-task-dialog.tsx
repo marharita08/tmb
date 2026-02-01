@@ -1,75 +1,68 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { SaveIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { QueryKey } from "@/const/query-key";
-import { TaskStatus } from "@/const/task-status";
-import { useCreateTaskMutation } from "@/hooks/use-create-task";
-import { type AddTaskSchema, addTaskSchema } from "@/schemas/add-task.schema";
+import { useUpdateTask } from "@/hooks/use-update-task";
+import {
+  type UpdateTaskSchema,
+  updateTaskSchema,
+} from "@/schemas/update-task.schema";
 import { useCurrentBoardStore } from "@/store/current-board.store";
+import type { TaskResponse } from "@/types/task.type";
 
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import InputError from "./ui/input-error";
 import { Textarea } from "./ui/textarea";
 
-export const AddTaskDialog = () => {
-  const [open, setOpen] = useState(false);
+type EditTaskDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  task: TaskResponse;
+};
+
+export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
+  open,
+  onOpenChange,
+  task,
+}) => {
   const { board } = useCurrentBoardStore();
   const queryClient = useQueryClient();
 
-  const form = useForm<AddTaskSchema>({
-    resolver: zodResolver(addTaskSchema),
+  const form = useForm<UpdateTaskSchema>({
+    resolver: zodResolver(updateTaskSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      boardId: board?.id ?? "",
+      title: task.title,
+      description: task.description,
     },
   });
 
-  const createTaskMutation = useCreateTaskMutation();
+  const updateTaskMutation = useUpdateTask();
 
-  const onSubmit = (data: AddTaskSchema) => {
-    createTaskMutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-        form.reset();
-        console.log(
-          "[BEFORE INVALIDATE]",
-          "boardId:",
-          board?.id ?? "",
-          "status:",
-          TaskStatus.TODO,
-          queryClient.getQueriesData({
-            queryKey: [QueryKey.TASKS, board?.id ?? "", TaskStatus.TODO],
-          }),
-        );
-        queryClient.invalidateQueries({
-          queryKey: [QueryKey.TASKS, board?.id ?? "", TaskStatus.TODO],
-        });
+  const onSubmit = (data: UpdateTaskSchema) => {
+    updateTaskMutation.mutate(
+      { id: task.id, data },
+      {
+        onSuccess: () => {
+          form.reset();
+          queryClient.invalidateQueries({
+            queryKey: [QueryKey.TASKS, board?.id ?? "", task.status],
+            exact: false,
+          });
+          onOpenChange(false);
+        },
       },
-    });
+    );
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button className="bg-white rounded-md px-4 py-2 flex justify-center cursor-pointer hover:text-primary w-full">
-          <PlusIcon className="w-10 h-10" />
-        </button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Task</DialogTitle>
+          <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -98,13 +91,13 @@ export const AddTaskDialog = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createTaskMutation.isPending}>
-              <PlusIcon className="w-4 h-4" />
-              Add
+            <Button type="submit" disabled={updateTaskMutation.isPending}>
+              <SaveIcon className="w-4 h-4" />
+              Save
             </Button>
           </div>
         </form>

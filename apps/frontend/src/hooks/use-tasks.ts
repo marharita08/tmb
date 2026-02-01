@@ -6,8 +6,8 @@ import type { GetTasksQuery } from "@/types/get-tasks-query.type";
 
 export const useTasks = (query: GetTasksQuery) => {
   return useInfiniteQuery({
-    queryKey: [QueryKey.TASKS, { ...query }],
-    queryFn: ({ pageParam = 1 }) =>
+    queryKey: [QueryKey.TASKS, query.boardId, query.status],
+    queryFn: async ({ pageParam = 1 }) =>
       taskService.findAll({ page: pageParam, ...query }),
     getNextPageParam: (lastPage, pages) =>
       lastPage.totalPages > pages.length ? pages.length + 1 : undefined,

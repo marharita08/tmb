@@ -3,7 +3,7 @@ import { RefreshCcwIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import InputError from "@/components/ui/input-error";
-import { useGetBoardMutation } from "@/hooks/use-get-board-mutation";
+import { useGetBoard } from "@/hooks/use-get-board";
 import {
   type LoadBoardSchema,
   loadBoardSchema,
@@ -20,7 +20,7 @@ export const LoadBoard = () => {
     },
   });
 
-  const getBoardMutation = useGetBoardMutation();
+  const getBoardMutation = useGetBoard();
 
   const onSubmit = (data: LoadBoardSchema) => {
     getBoardMutation.mutate(data.boardId, {
