@@ -11,6 +11,10 @@ export const useCreateBoard = () => {
   return useAppMutation([MutationKey.CREATE_BOARD], {
     mutationFn: boardService.create,
     onSuccess: (data) => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("boardId", data.id);
+      window.history.pushState({}, "", `?${params.toString()}`);
+      
       setBoard(data);
       toast({
         title: "Board created successfully",

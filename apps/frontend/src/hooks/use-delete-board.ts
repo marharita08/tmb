@@ -15,6 +15,15 @@ export const useDeleteBoard = () => {
   return useAppMutation([MutationKey.DELETE_BOARD], {
     mutationFn: boardService.delete,
     onSuccess: () => {
+      const params = new URLSearchParams(window.location.search);
+      params.delete('boardId');
+
+      const newUrl =
+        params.toString()
+          ? `${window.location.pathname}?${params.toString()}`
+          : window.location.pathname;
+
+      window.history.replaceState({}, '', newUrl);
       clearBoard();
       queryClient.invalidateQueries({
         queryKey: [QueryKey.BOARDS],
