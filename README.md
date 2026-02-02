@@ -29,7 +29,6 @@ Task Management Boards is a web application that allows users to manage tasks us
 |----------|-------------|---------|
 | DATABASE_URL | Connection string for the database | postgres://user:password@localhost:5432/dbname |
 | PORT | Port for the backend server to run on | 3000 |
-| FRONTEND_URL | URL of the frontend application | http://localhost:5173 |
 
 ## Local Setup
 
