@@ -3,7 +3,8 @@ import type { AddTaskSchema } from "@/schemas/add-task.schema";
 import type { UpdateTaskSchema } from "@/schemas/update-task.schema";
 import type { GetTasksQuery } from "@/types/get-tasks-query.type";
 import type { MoveTaskBody } from "@/types/move-task-body.type";
-import type { TaskListResponse, TaskResponse } from "@/types/task.type";
+import type { PaginatedResponse } from "@/types/paginated-response.type";
+import type { TaskResponse } from "@/types/task.type";
 
 import { httpService } from "./http.service";
 
@@ -16,7 +17,7 @@ class TaskService {
   }
 
   async findAll(query: GetTasksQuery) {
-    return httpService.get<TaskListResponse>(BackendRouterKey.TASKS, query);
+    return httpService.get<PaginatedResponse<TaskResponse>>(BackendRouterKey.TASKS, query);
   }
 
   async delete(id: string) {
