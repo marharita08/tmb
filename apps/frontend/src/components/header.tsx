@@ -1,4 +1,5 @@
 import { AddBoardDialog } from "./add-board-dialog";
+import { AllBoardsDialog } from "./all-boards-dialog";
 
 export const Header = () => {
   return (
@@ -6,7 +7,10 @@ export const Header = () => {
       <h1 className="text-2xl font-bold text-primary">
         Task Management Boards
       </h1>
-      <AddBoardDialog />
+      <div className="flex items-center gap-2">
+        <AddBoardDialog />
+        <AllBoardsDialog />
+      </div>
     </header>
   );
 };

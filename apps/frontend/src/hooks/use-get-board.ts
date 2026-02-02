@@ -1,23 +1,27 @@
-//import { useQueryClient } from "@tanstack/react-query";
-
-import { MutationKey } from "@/const/mutation-key";
-//import { QueryKey } from "@/const/query-key";
+import { QueryKey } from "@/const/query-key";
 import { boardService } from "@/services/board.service";
-import { useCurrentBoardStore } from "@/store/current-board.store";
 
-import { useAppMutation } from "./use-app-mutation";
+import { useAppQuery } from "./use-app-query";
 
-export const useGetBoard = () => {
+/*export const useGetBoard = () => {
   const { setBoard } = useCurrentBoardStore();
-  //const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useAppMutation([MutationKey.GET_BOARD], {
     mutationFn: boardService.findOne,
     onSuccess: (data) => {
-      /*queryClient.removeQueries({
+      queryClient.invalidateQueries({
         queryKey: [QueryKey.TASKS],
-      });*/
+      });
       setBoard(data);
     },
+  });
+};*/
+
+export const useGetBoard = (boardId: string | null) => {
+  return useAppQuery({
+    queryKey: [QueryKey.BOARDS, boardId],
+    queryFn: () => boardService.findOne(boardId ?? ""),
+    enabled: !!boardId,
   });
 };

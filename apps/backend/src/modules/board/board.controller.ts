@@ -4,8 +4,10 @@ import {
   Body,
   Param,
   Get,
-  Put,
   Delete,
+  ParseIntPipe,
+  Query,
+  Patch,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -19,12 +21,20 @@ export class BoardController {
     return this.boardService.create(createBoardDto);
   }
 
+  @Get()
+  findAll(
+    @Query('page', new ParseIntPipe({ optional: true })) page = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,
+  ) {
+    return this.boardService.findAll(page, limit);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.boardService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updateBoardDto: CreateBoardDto) {
     return this.boardService.update(id, updateBoardDto);
   }

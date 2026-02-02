@@ -31,7 +31,7 @@ model Task {
   status      TaskStatus @default(TODO)
   position    Int
   boardId     String     @map("board_id")
-  board       Board      @relation(fields: [boardId], references: [id])
+  board       Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
 

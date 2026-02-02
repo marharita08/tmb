@@ -81,7 +81,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({ taskStatus }) => {
           </div>
         )}
 
-        <div style={{ height: 1 }} ref={observerTarget} />
+        <div ref={observerTarget} />
 
         {taskStatus === TaskStatus.TODO && <AddTaskDialog />}
       </div>

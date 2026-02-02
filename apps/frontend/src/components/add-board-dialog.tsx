@@ -32,17 +32,23 @@ export const AddBoardDialog = () => {
 
   const createBoardMutation = useCreateBoard();
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      form.reset();
+    }
+    setOpen(open);
+  };
+
   const onSubmit = (data: AddBoardSchema) => {
     createBoardMutation.mutate(data, {
       onSuccess: () => {
-        setOpen(false);
-        form.reset();
+        handleOpenChange(false);
       },
     });
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <PlusIcon className="w-4 h-4" />
@@ -70,7 +76,7 @@ export const AddBoardDialog = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>

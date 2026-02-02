@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RefreshCcwIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import InputError from "@/components/ui/input-error";
@@ -8,6 +9,7 @@ import {
   type LoadBoardSchema,
   loadBoardSchema,
 } from "@/schemas/load-board.schema";
+import { useCurrentBoardStore } from "@/store/current-board.store";
 
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -20,14 +22,27 @@ export const LoadBoard = () => {
     },
   });
 
-  const getBoardMutation = useGetBoard();
+  const { setBoard } = useCurrentBoardStore();
+
+  const params = new URLSearchParams(window.location.search);
+  const boardIdParam = params.get("boardId") ?? null;
+  const [boardId, setBoardId] = useState<string | null>(boardIdParam ?? null);
+
+  const { data } = useGetBoard(boardId);
+
+  useEffect(() => {
+    if (data) {
+      setBoard(data);
+    }
+  }, [data, setBoard]);
 
   const onSubmit = (data: LoadBoardSchema) => {
-    getBoardMutation.mutate(data.boardId, {
-      onSuccess: () => {
-        form.reset();
-      },
-    });
+    const params = new URLSearchParams(window.location.search);
+    params.set("boardId", data.boardId);
+    setBoardId(data.boardId);
+
+    window.history.pushState({}, "", `?${params.toString()}`);
+    form.reset();
   };
 
   const isEmpty = !form.watch("boardId");
@@ -43,7 +58,7 @@ export const LoadBoard = () => {
         />
         <InputError error={form.formState.errors.boardId?.message} />
       </div>
-      <Button type="submit" disabled={getBoardMutation.isPending || isEmpty}>
+      <Button type="submit" disabled={isEmpty}>
         <RefreshCcwIcon className="w-4 h-4" />
         Load
       </Button>

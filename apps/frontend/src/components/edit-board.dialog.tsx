@@ -1,14 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
+import { SaveIcon, SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { QueryKey } from "@/const/query-key";
-import { TaskStatus } from "@/const/task-status";
-import { useCreateTaskMutation } from "@/hooks/use-create-task";
-import { type AddTaskSchema, addTaskSchema } from "@/schemas/add-task.schema";
+import { useUpdateBoard } from "@/hooks/use-update-board";
+import {
+  type UpdateBoardSchema,
+  updateBoardSchema,
+} from "@/schemas/update-board.schema";
 import { useCurrentBoardStore } from "@/store/current-board.store";
+import type { BoardResponse } from "@/types/board.type";
 
 import { Button } from "./ui/button";
 import {
@@ -20,19 +23,20 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import InputError from "./ui/input-error";
-import { Textarea } from "./ui/textarea";
 
-export const AddTaskDialog = () => {
+type EditBoardDialogProps = {
+  board: BoardResponse;
+};
+
+export const EditBoardDialog: React.FC<EditBoardDialogProps> = ({ board }) => {
   const [open, setOpen] = useState(false);
-  const { board } = useCurrentBoardStore();
   const queryClient = useQueryClient();
 
-  const form = useForm<AddTaskSchema>({
-    resolver: zodResolver(addTaskSchema),
+  const { setBoard } = useCurrentBoardStore();
+  const form = useForm<UpdateBoardSchema>({
+    resolver: zodResolver(updateBoardSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      boardId: board?.id ?? "",
+      title: board.title,
     },
   });
 
@@ -43,35 +47,39 @@ export const AddTaskDialog = () => {
     setOpen(open);
   };
 
-  const createTaskMutation = useCreateTaskMutation();
+  const updateBoardMutation = useUpdateBoard();
 
-  const onSubmit = (data: AddTaskSchema) => {
-    createTaskMutation.mutate(data, {
-      onSuccess: () => {
-        handleOpenChange(false);
-        queryClient.invalidateQueries({
-          queryKey: [QueryKey.TASKS, board?.id ?? "", TaskStatus.TODO],
-        });
+  const onSubmit = (data: UpdateBoardSchema) => {
+    updateBoardMutation.mutate(
+      { id: board.id, data },
+      {
+        onSuccess: (data) => {
+          setBoard(data);
+          queryClient.invalidateQueries({
+            queryKey: [QueryKey.BOARDS],
+          });
+          handleOpenChange(false);
+        },
       },
-    });
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="bg-white rounded-md px-4 py-2 flex justify-center cursor-pointer hover:text-primary w-full">
-          <PlusIcon className="w-10 h-10" />
-        </button>
+        <Button variant="ghost" size="icon">
+          <SquarePenIcon className="w-4 h-4" />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Task</DialogTitle>
+          <DialogTitle>Edit Board</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="px-4 py-3 flex flex-col gap-6"
         >
-          <div className="flex flex-col gap-1">
+          <div>
             <Input
               {...form.register("title")}
               label="Title"
@@ -79,16 +87,6 @@ export const AddTaskDialog = () => {
               isEmpty={!form.watch("title")}
             />
             <InputError error={form.formState.errors.title?.message} />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Textarea
-              className="max-h-40"
-              label="Description"
-              {...form.register("description")}
-              error={!!form.formState.errors.description?.message}
-              isEmpty={!form.watch("description")}
-            />
-            <InputError error={form.formState.errors.description?.message} />
           </div>
           <div className="flex justify-end gap-2">
             <Button
@@ -98,9 +96,9 @@ export const AddTaskDialog = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createTaskMutation.isPending}>
-              <PlusIcon className="w-4 h-4" />
-              Add
+            <Button type="submit" disabled={updateBoardMutation.isPending}>
+              <SaveIcon />
+              Save
             </Button>
           </div>
         </form>

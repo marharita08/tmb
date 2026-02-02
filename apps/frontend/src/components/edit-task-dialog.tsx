@@ -40,6 +40,13 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
     },
   });
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      form.reset();
+    }
+    onOpenChange(open);
+  };
+
   const updateTaskMutation = useUpdateTask();
 
   const onSubmit = (data: UpdateTaskSchema) => {
@@ -47,19 +54,18 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
       { id: task.id, data },
       {
         onSuccess: () => {
-          form.reset();
           queryClient.invalidateQueries({
             queryKey: [QueryKey.TASKS, board?.id ?? "", task.status],
             exact: false,
           });
-          onOpenChange(false);
+          handleOpenChange(false);
         },
       },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
@@ -91,7 +97,7 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>

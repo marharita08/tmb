@@ -9,10 +9,3 @@ export type TaskResponse = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type TaskListResponse = {
-  items: TaskResponse[];
-  total: number;
-  page: number;
-  totalPages: number;
-};

@@ -28,21 +28,8 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
   const handleDelete = () => {
     deleteTaskMutation.mutate(task.id, {
       onSuccess: () => {
-        console.log(
-          "[BEFORE INVALIDATE]",
-          "boardId:",
-          board?.id ?? "",
-          "status:",
-          task.status,
-          queryClient.getQueriesData({
-            queryKey: [QueryKey.TASKS, board?.id ?? "", TaskStatus.TODO],
-            exact: false,
-          }),
-        );
-        console.log("ALL QUERIES", queryClient.getQueryCache().getAll());
         queryClient.invalidateQueries({
           queryKey: [QueryKey.TASKS, board?.id ?? "", TaskStatus.TODO],
-          exact: false,
         });
         onOpenChange(false);
       },

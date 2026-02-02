@@ -12,9 +12,12 @@ import { QueryKey } from "@/const/query-key";
 import { TaskStatus } from "@/const/task-status";
 import { useMoveTask } from "@/hooks/use-move-task";
 import { useCurrentBoardStore } from "@/store/current-board.store";
-import type { TaskListResponse, TaskResponse } from "@/types/task.type";
+import type { PaginatedResponse } from "@/types/paginated-response.type";
+import type { TaskResponse } from "@/types/task.type";
 
 import { BoardColumn } from "./board-column";
+import { DeleteBoardDialog } from "./delete-board-dialog";
+import { EditBoardDialog } from "./edit-board.dialog";
 import { TaskCard } from "./task-card";
 
 export const Board = () => {
@@ -32,14 +35,16 @@ export const Board = () => {
     >;
     Object.values(TaskStatus).forEach((status) => {
       const data =
-        queryClient.getQueryData<TaskListResponse>([
+        queryClient.getQueryData<PaginatedResponse<TaskResponse>>([
           QueryKey.TASKS,
           board.id,
           status,
         ]) ?? [];
       if (data && "pages" in data) {
-        result[status] = (data.pages as TaskListResponse[]).flatMap(
-          (page: TaskListResponse) => page.items,
+        result[status] = (
+          data.pages as PaginatedResponse<TaskResponse>[]
+        ).flatMap(
+          (page: PaginatedResponse<TaskResponse>) => page.items,
         ) as TaskResponse[];
       }
     });
@@ -94,12 +99,12 @@ export const Board = () => {
 
     queryClient.setQueryData(
       [QueryKey.TASKS, board?.id, activeStatus],
-      (old: { pages?: TaskListResponse[] }) => {
+      (old: { pages?: PaginatedResponse<TaskResponse>[] }) => {
         if (!old?.pages) return old;
 
         return {
           ...old,
-          pages: old.pages.map((page: TaskListResponse) => ({
+          pages: old.pages.map((page: PaginatedResponse<TaskResponse>) => ({
             ...page,
             items: page.items.filter(
               (t: TaskResponse) => t.id !== activeTaskId,
@@ -111,10 +116,12 @@ export const Board = () => {
 
     queryClient.setQueryData(
       [QueryKey.TASKS, board?.id, overStatus],
-      (old: { pages?: TaskListResponse[] }) => {
+      (old: { pages?: PaginatedResponse<TaskResponse>[] }) => {
         if (!old?.pages) return old;
 
-        const flat = old.pages.flatMap((p: TaskListResponse) => p.items);
+        const flat = old.pages.flatMap(
+          (p: PaginatedResponse<TaskResponse>) => p.items,
+        );
 
         return {
           ...old,
@@ -123,7 +130,7 @@ export const Board = () => {
               ...old.pages[0],
               items: targetTasks,
             },
-            ...old.pages.slice(1).map((p: TaskListResponse) => ({
+            ...old.pages.slice(1).map((p: PaginatedResponse<TaskResponse>) => ({
               ...p,
               items: p.items.filter(
                 (t: TaskResponse) =>
@@ -169,9 +176,14 @@ export const Board = () => {
     <>
       {board && (
         <section className="space-y-4">
-          <h3 className="text-xl font-semibold text-center">
-            {board.title} <span className="font-normal">(id: {board.id})</span>
-          </h3>
+          <div className="flex items-center gap-2 justify-center">
+            <h3 className="text-xl font-semibold text-center">
+              {board.title}{" "}
+              <span className="font-normal">(id: {board.id})</span>
+            </h3>
+            <EditBoardDialog board={board} />
+            <DeleteBoardDialog board={board} />
+          </div>
 
           <DndContext
             onDragEnd={handleDragEnd}
@@ -184,7 +196,7 @@ export const Board = () => {
               ))}
             </div>
             <DragOverlay>
-              {activeTask ? <TaskCard task={activeTask} /> : null}
+              {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
             </DragOverlay>
           </DndContext>
         </section>

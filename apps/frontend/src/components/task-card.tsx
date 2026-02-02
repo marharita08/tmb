@@ -30,7 +30,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <div
       className={cn(
-        "bg-white rounded-md px-4 py-2 flex flex-col gap-1 shadow-md border border-primary/10 hover:cursor-grab",
+        "bg-white rounded-md px-4 py-2 flex flex-col gap-1 shadow-md border border-primary/10 cursor-grab",
         isOverlay && "cursor-grabbing",
         isDragging && "opacity-0",
       )}
