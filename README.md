@@ -1,5 +1,7 @@
 # Task Management Boards
 
+Note: Project deployed on Render, so it takes some time to wake up backend after some time of inactivity.
+
 Task Management Boards is a web application that allows users to manage tasks using boards with multiple columns. Each board contains three columns: **To Do**, **In Progress**, and **Done**. Users can create, edit, delete, and drag tasks between columns for easy task management.
 
 ## Features
